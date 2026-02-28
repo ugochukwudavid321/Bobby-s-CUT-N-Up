@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber Shop Lufkin TX | Bobby's Cut-N-Up</title>
+    <meta name="description" content="Lufkin's favorite barber since day one. Bobby's Cut-N-Up delivers perfect cuts every time. Walk-ins welcome or call 936-634-7119.">
+    <meta name="theme-color" content="#0A0A0A">
+    
+    <!-- Preconnect & Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#8B1A1A',
+                            dark: '#0A0A0A',
+                            panel: '#111111',
+                            surface: '#0F0A05',
+                            text: '#E5E5E5',
+                            muted: '#A3A3A3',
+                            gold: '#D4AF37'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        /* Base Setup */
+        body {
+            background-color: #0A0A0A;
+            color: #E5E5E5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Typography Utilities */
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* Cinematic Loader Canvas */
+        #loader-canvas, #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Loader Overlay specific z-index */
+        #loader-overlay {
+            z-index: 9999;
+        }
+        #loader-canvas {
+            z-index: -1;
+        }
+
+        /* Text Glow Effect */
+        .glow-text-red {
+            text-shadow: 0 0 20px rgba(139, 26, 26, 0.6), 0 0 40px rgba(139, 26, 26, 0.4);
+        }
+
+        /* Focus Outlines for Accessibility */
+        *:focus-visible {
+            outline: 2px solid #8B1A1A;
+            outline-offset: 2px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8B1A1A;
+        }
+
+        /* Utility for GSAP hiding elements initially */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    </style>
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BarberShop",
+      "name": "Bobby's Cut-N-Up",
+      "description": "Old school barbershop in Lufkin, TX. One barber, one standard — perfect cuts every time. Walk-ins welcome, or call ahead to secure your spot.",
+      "url": "https://www.bobbyscutnup.com",
+      "telephone": "+19366347119",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "3213 S. Medford Plaza",
+        "addressLocality": "Lufkin",
+        "addressRegion": "TX",
+        "postalCode": "75904",
+        "addressCountry": "US"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 31.3129,
+        "longitude": -94.7431
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "08:00",
+          "closes": "17:00"
+        }
+      ],
+      "areaServed": "Lufkin, TX",
+      "priceRange": "$$"
+    }
+    </script>
+</head>
+<body class="relative">
+
+    <!-- 1️⃣ Cinematic Entrance Overlay -->
+    <div id="loader-overlay" class="fixed inset-0 bg-brand-dark flex flex-col items-center justify-center overflow-hidden">
+        <canvas id="loader-canvas"></canvas>
+        <div class="relative z-10 text-center flex flex-col items-center px-4">
+            <h1 id="loader-brand" class="font-serif text-4xl md:text-6xl text-white font-bold opacity-0 scale-95 tracking-tight">
+                Bobby's Cut-N-Up
+            </h1>
+            <div id="loader-location" class="mt-4 text-brand-gold font-sans text-sm tracking-[0.2em] uppercase opacity-0">
+                Lufkin, TX
+            </div>
+            <div class="w-full max-w-[200px] h-[1px] bg-brand-red mt-6 overflow-hidden relative opacity-0" id="loader-line-container">
+                <div id="loader-line" class="absolute top-0 left-0 h-full w-full bg-white transform -translate-x-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2️⃣ Sticky Header -->
+    <header class="fixed top-0 left-0 w-full bg-brand-dark/95 backdrop-blur-md z-50 border-b border-white/5 transition-all duration-300" id="main-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 group focus:outline-none" aria-label="Go to homepage">
+                    <i data-lucide="scissors" class="w-6 h-6 text-brand-red group-hover:text-white transition-colors duration-300"></i>
+                    <span class="font-serif font-bold text-xl tracking-tight text-white group-hover:text-brand-red transition-colors duration-300">Bobby's Cut-N-Up</span>
+                </a>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#why-bobby" class="text-sm font-medium text-brand-muted hover:text-white transition-colors">Why Bobby?</a>
+                    <a href="#reviews" class="text-sm font-medium text-brand-muted hover:text-white transition-colors">Reviews</a>
+                    <a href="#booking" class="text-sm font-medium text-brand-muted hover:text-white transition-colors">Contact</a>
+                </nav>
+
+                <!-- Persistent CTA (Desktop & Tablet) -->
+                <div class="hidden sm:flex items-center">
+                    <a href="tel:+19366347119" class="inline-flex items-center justify-center px-6 py-2.5 border border-brand-red bg-brand-red/10 text-brand-red hover:bg-brand-red hover:text-white font-semibold rounded-sm transition-all duration-300 group" aria-label="Call Bobby at 936-634-7119">
+                        <i data-="phone" class="w-4 h-4 mr-2 group-hover:animate-pulse"></i>
+                        Call Bobby
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="flex sm:hidden items-center justify-center p-2 text-brand-muted hover:text-white focus:outline-none" aria-label="Open mobile menu" aria-expanded="false">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-[#0A0A0A] z-[200] transform translate-x-full transition-transform duration-300 ease-in-out pt-24 px-6 flex flex-col overflow-hidden">
+            <nav class="flex flex-col space-y-6">
+                <a href="#why-bobby" class="mobile-link text-2xl font-serif text-white hover:text-brand-red transition-colors">Why Bobby?</a>
+                <a href="#reviews" class="mobile-link text-2xl font-serif text-white hover:text-brand-red transition-colors">Reviews</a>
+                <a href="#booking" class="mobile-link text-2xl font-serif text-white hover:text-brand-red transition-colors">Contact</a>
+                <div class="pt-8 border-t border-white/10 mt-8">
+                    <a href="tel:+19366347119" class="flex items-center justify-center w-full px-6 py-4 bg-brand-red text-white font-bold text-lg rounded-sm" aria-label="Call Bobby now">
+                        <i data-lucide="phone-call" class="w-5 h-5 mr-3"></i>
+                        Call 936-634-7119
+                    </a>
+                </div>
+            </nav>
+            <button id="close-menu-btn" class="absolute top-6 right-6 p-2 text-white" aria-label="Close menu">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 3️⃣ Hero Section -->
+        <section id="hero" class="relative min-h-screen flex items-center pt-20 overflow-hidden bg-brand-dark">
+            <canvas id="hero-canvas"></canvas>
+            
+            <!-- Radial Gradient Overlay to ensure text readability -->
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(10,10,10,0.4)_0%,rgba(10,10,10,1)_100%)] z-0"></div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 lg:py-20">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Left: Main Copy -->
+                    <div class="lg:col-span-7 flex flex-col items-start text-left reveal-element hero-elem">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-6">
+                            <span class="w-2 h-2 rounded-full bg-brand-red animate-pulse"></span>
+                            <span class="text-xs font-medium text-brand-muted tracking-wide uppercase">Classic Lufkin Barbershop</span>
+                        </div>
+                        
+                        <h1 class="text-5xl sm:text-6xl md:text-7xl font-black text-white leading-[1.1] mb-6 drop-shadow-lg">
+                            Lufkin's Favorite Barber.<br>
+                            <span class="text-brand-red glow-text-red">Call Bobby.</span>
+                        </h1>
+                        
+                        <p class="text-lg sm:text-xl text-brand-muted mb-10 max-w-2xl leading-relaxed">
+                            One barber. One standard. Bobby cuts your hair exactly how you ask — every single time. Call ahead to secure your spot or walk right in.
+                        </p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <a href="tel:+19366347119" class="inline-flex items-center justify-center px-8 py-4 text-base md:text-lg font-bold text-white bg-brand-red hover:bg-red-800 rounded-sm transition-all shadow-[0_0_20px_rgba(139,26,26,0.4)] hover:shadow-[0_0_30px_rgba(139,26,26,0.6)] min-w-[280px]" aria-label="Call Bobby to book appointment">
+                                <i data-lucide="phone" class="w-5 h-5 mr-3"></i>
+                                Call Bobby — 936-634-7119
+                            </a>
+                            <a href="https://maps.google.com/?q=3213+S.+Medford+Plaza,+Lufkin,+TX+75904" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-8 py-4 text-base md:text-lg font-semibold text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-sm transition-colors min-w-[200px]" aria-label="Get directions to barbershop on Google Maps">
+                                <i data-lucide="map-pin" class="w-5 h-5 mr-3 text-brand-muted"></i>
+                                Get Directions
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right: Info Card -->
+                    <div class="lg:col-span-5 w-full reveal-element hero-elem delay-100">
+                        <div class="bg-brand-panel/80 backdrop-blur-md border border-white/10 p-8 rounded-sm shadow-2xl relative overflow-hidden group">
+                            <!-- Decorative accent -->
+                            <div class="absolute top-0 left-0 w-1 h-full bg-brand-red"></div>
+                            
+                            <h2 class="font-serif text-2xl text-white mb-6 border-b border-white/10 pb-4">Shop Details</h2>
+                            
+                            <ul class="space-y-6">
+                                <li class="flex items-start">
+                                    <div class="flex-shrink-0 mt-1">
+                                        <div class="w-8 h-8 rounded-full bg-brand-red/10 flex items-center justify-center">
+                                            <i data-lucide="users" class="w-4 h-4 text-brand-red"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-white font-medium">Walk-Ins Welcome</p>
+                                        <p class="text-sm text-brand-muted mt-1">Drop by the shop or call ahead to lock in your spot.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="flex-shrink-0 mt-1">
+                                        <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                                            <i data-lucide="clock" class="w-4 h-4 text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-white font-medium">Open Mondays</p>
+                                        <p class="text-sm text-brand-muted mt-1">While others are closed, we're ready to cut.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start">
+                                    <div class="flex-shrink-0 mt-1">
+                                        <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                                            <i data-lucide="map" class="w-4 h-4 text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-white font-medium">Location</p>
+                                        <p class="text-sm text-brand-muted mt-1">3213 S. Medford Plaza<br>Lufkin, TX 75904</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                            <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                                <p class="text-sm text-brand-muted mb-2">Ready for a real haircut?</p>
+                                <a href="tel:+19366347119" class="text-xl font-serif font-bold text-white hover:text-brand-red transition-colors inline-block" aria-label="Call to book">
+                                    Call The Shop
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 4️⃣ Icon Feature Grid (Why Bobby?) -->
+        <section id="why-bobby" class="py-24 bg-[#0d0d0d] border-t border-white/5 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal-element">
+                    <h2 class="text-sm font-bold tracking-widest text-brand-red uppercase mb-3">The Standard</h2>
+                    <h3 class="font-serif text-3xl md:text-5xl text-white font-bold">Why Choose Bobby?</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="bg-brand-panel p-8 rounded-sm border border-white/5 hover:border-brand-red/30 transition-colors group reveal-element feature-card">
+                        <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6 border border-white/10 group-hover:bg-brand-red/10 group-hover:border-brand-red/50 transition-all">
+                            <i data-lucide="scissors" class="w-5 h-5 text-white group-hover:text-brand-red"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-3 font-serif">One Barber, One Standard</h4>
+                        <p class="text-brand-muted text-sm leading-relaxed">Bobby does every cut himself — no guessing, no handoffs. You get consistency every time you sit in the chair.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="bg-brand-panel p-8 rounded-sm border border-white/5 hover:border-brand-red/30 transition-colors group reveal-element feature-card">
+                        <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6 border border-white/10 group-hover:bg-brand-red/10 group-hover:border-brand-red/50 transition-all">
+                            <i data-lucide="door-open" class="w-5 h-5 text-white group-hover:text-brand-red"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-3 font-serif">Walk-Ins & Calls Welcome</h4>
+                        <p class="text-brand-muted text-sm leading-relaxed">Drop in when you're free, or call ahead to lock in your time. We get you in the chair and looking sharp without the all-day wait.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="bg-brand-panel p-8 rounded-sm border border-white/5 hover:border-brand-red/30 transition-colors group reveal-element feature-card">
+                        <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6 border border-white/10 group-hover:bg-brand-red/10 group-hover:border-brand-red/50 transition-all">
+                            <i data-lucide="star" class="w-5 h-5 text-brand-gold"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-3 font-serif">Lufkin's #1 Rated</h4>
+                        <p class="text-brand-muted text-sm leading-relaxed">Dozens of 5-star Google reviews and counting. Real feedback from men in East Texas who demand a proper cut.</p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="bg-brand-panel p-8 rounded-sm border border-white/5 hover:border-brand-red/30 transition-colors group reveal-element feature-card">
+                        <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6 border border-white/10 group-hover:bg-brand-red/10 group-hover:border-brand-red/50 transition-all">
+                            <i data-lucide="calendar" class="w-5 h-5 text-white group-hover:text-brand-red"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-3 font-serif">Open Mondays</h4>
+                        <p class="text-brand-muted text-sm leading-relaxed">When most barbers take the day off, Bobby's already at work. Start your work week looking sharp.</p>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="bg-brand-panel p-8 rounded-sm border border-white/5 hover:border-brand-red/30 transition-colors group reveal-element feature-card">
+                        <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6 border border-white/10 group-hover:bg-brand-red/10 group-hover:border-brand-red/50 transition-all">
+                            <i data-lucide="car" class="w-5 h-5 text-white group-hover:text-brand-red"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-3 font-serif">Clean Shop, Easy Parking</h4>
+                        <p class="text-brand-muted text-sm leading-relaxed">Well lit, spacious, and professional environment located conveniently at 3213 S. Medford Plaza with plenty of parking.</p>
+                    </div>
+
+                    <!-- Feature 6 -->
+                    <div class="bg-brand-panel p-8 rounded-sm border border-white/5 hover:border-brand-red/30 transition-colors group reveal-element feature-card">
+                        <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6 border border-white/10 group-hover:bg-brand-red/10 group-hover:border-brand-red/50 transition-all">
+                            <i data-lucide="award" class="w-5 h-5 text-white group-hover:text-brand-red"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-white mb-3 font-serif">Loyal for Decades</h4>
+                        <p class="text-brand-muted text-sm leading-relaxed">Customers who started coming in as kids still sit in Bobby's chair today. That kind of loyalty is earned through quality.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5️⃣ Deep Sales Content -->
+        <section id="about" class="py-24 bg-brand-dark relative z-10">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="prose prose-invert prose-lg md:prose-xl mx-auto reveal-element">
+                    <h2 class="font-serif text-3xl md:text-5xl text-white font-bold mb-8 leading-tight">Finding a barber you can actually trust in Lufkin TX is harder than it sounds.</h2>
+                    
+                    <p class="text-brand-muted mb-6">
+                        We've all been there. You walk into a chain shop. The lobby is packed. You wait thirty minutes just to be rushed into a chair by someone who doesn't listen to what you want, hands you off if they get busy, and leaves you fixing your hair in the rearview mirror on the way home.
+                    </p>
+                    
+                    <p class="text-brand-muted mb-6">
+                        Your hair is your image. You shouldn't have to gamble with it.
+                    </p>
+                    
+                    <p class="text-white font-medium mb-6 text-xl">
+                        That's why Bobby's Cut-N-Up operates differently. Whether you call ahead or walk right in, you get our full attention.
+                    </p>
+                    
+                    <p class="text-brand-muted mb-6">
+                        You get one barber, focus, and your cut done right. Bobby has built a reputation over decades for doing exactly what you ask for. No surprises. No rushing. Just old-school craftsmanship mixed with modern precision.
+                    </p>
+
+                    <p class="text-brand-muted mb-10">
+                        There's a reason men who started coming here as kids still sit in Bobby's chair today. We're open Mondays when others are closed, and we're dedicated to keeping Lufkin looking sharp.
+                    </p>
+
+                    <div class="p-6 border-l-4 border-brand-red bg-brand-panel/50 rounded-r-sm">
+                        <p class="text-white font-serif italic text-xl mb-4">"Don't risk your next haircut. Get it done right the first time."</p>
+                        <a href="tel:+19366347119" class="inline-flex items-center text-brand-red hover:text-white font-bold transition-colors group text-lg" aria-label="Call Bobby before your next cut">
+                            Call Bobby before your next cut — 936-634-7119
+                            <i data-lucide="arrow-right" class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6️⃣ Trust & Proof Section -->
+        <section id="reviews" class="py-24 bg-brand-surface relative border-y border-brand-red/10 z-10 overflow-hidden">
+            <!-- Decorative Background Elements -->
+            <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-brand-red/5 blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-brand-red/5 blur-3xl pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <!-- Authority Bar -->
+                <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 mb-16 py-6 border-b border-white/5 reveal-element">
+                    <div class="flex items-center gap-2">
+                        <div class="flex">
+                            <i data-lucide="star" class="w-5 h-5 text-brand-gold fill-brand-gold"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-brand-gold fill-brand-gold"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-brand-gold fill-brand-gold"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-brand-gold fill-brand-gold"></i>
+                            <i data-lucide="star" class="w-5 h-5 text-brand-gold fill-brand-gold"></i>
+                        </div>
+                        <span class="text-white font-bold">5.0 Google Rating</span>
+                    </div>
+                    <span class="hidden md:inline text-brand-muted">•</span>
+                    <span class="text-brand-muted font-medium flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-brand-red"></i> Open Mondays
+                    </span>
+                    <span class="hidden md:inline text-brand-muted">•</span>
+                    <span class="text-brand-muted font-medium flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4 text-brand-red"></i> Walk-Ins Welcome
+                    </span>
+                    <span class="hidden md:inline text-brand-muted">•</span>
+                    <span class="text-brand-muted font-medium flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-brand-red"></i> Lufkin TX
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Review 1 -->
+                    <blockquote class="bg-brand-dark p-8 rounded-sm border border-white/5 relative reveal-element review-card">
+                        <i data-lucide="quote" class="absolute top-6 right-6 w-8 h-8 text-white/5"></i>
+                        <p class="text-brand-muted mb-6 leading-relaxed relative z-10">
+                            "Gets you in, sets you down, gives a great haircut and gets you out. Last of the true old school barber shops."
+                        </p>
+                        <footer class="flex items-center gap-3 border-t border-white/5 pt-4">
+                            <div class="w-10 h-10 rounded-full bg-brand-red/20 flex items-center justify-center text-brand-red font-bold font-serif">J</div>
+                            <div>
+                                <strong class="text-white block text-sm">James Cole</strong>
+                                <span class="text-xs text-brand-muted">Local Guide</span>
+                            </div>
+                        </footer>
+                    </blockquote>
+
+                    <!-- Review 2 -->
+                    <blockquote class="bg-brand-dark p-8 rounded-sm border border-white/5 relative reveal-element review-card delay-100">
+                        <i data-lucide="quote" class="absolute top-6 right-6 w-8 h-8 text-white/5"></i>
+                        <p class="text-brand-muted mb-6 leading-relaxed relative z-10">
+                            "Bobby's haircut shop has always been the best place to get a haircut! He deserves to be #1 in Lufkin!!!"
+                        </p>
+                        <footer class="flex items-center gap-3 border-t border-white/5 pt-4">
+                            <div class="w-10 h-10 rounded-full bg-brand-red/20 flex items-center justify-center text-brand-red font-bold font-serif">R</div>
+                            <div>
+                                <strong class="text-white block text-sm">Ronald Garcia</strong>
+                                <span class="text-xs text-brand-muted">Customer</span>
+                            </div>
+                        </footer>
+                    </blockquote>
+
+                    <!-- Review 3 -->
+                    <blockquote class="bg-brand-dark p-8 rounded-sm border border-white/5 relative reveal-element review-card delay-200">
+                        <i data-lucide="quote" class="absolute top-6 right-6 w-8 h-8 text-white/5"></i>
+                        <p class="text-brand-muted mb-6 leading-relaxed relative z-10">
+                            "I highly recommend Bobby's Cut-N-Up if you want a good haircut! Best in town."
+                        </p>
+                        <footer class="flex items-center gap-3 border-t border-white/5 pt-4">
+                            <div class="w-10 h-10 rounded-full bg-brand-red/20 flex items-center justify-center text-brand-red font-bold font-serif">D</div>
+                            <div>
+                                <strong class="text-white block text-sm">Daegan Reid</strong>
+                                <span class="text-xs text-brand-muted">Customer</span>
+                            </div>
+                        </footer>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7️⃣ Conversion Section (Hard Close) & 8️⃣ Contact Form -->
+        <section id="booking" class="py-24 bg-brand-dark relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    
+                    <!-- Hard Close Copy -->
+                    <div class="text-center lg:text-left reveal-element">
+                        <h2 class="font-serif text-4xl md:text-6xl text-white font-bold mb-6 leading-tight">
+                            Ready for Your Best Haircut in Lufkin?
+                        </h2>
+                        <p class="text-xl text-brand-muted mb-10 max-w-lg mx-auto lg:mx-0">
+                            Don't settle for whoever's available. Call Bobby, get in the chair, and get a cut done right.
+                        </p>
+                        
+                        <div class="flex flex-col items-center lg:items-start gap-6">
+                            <a href="tel:+19366347119" class="inline-flex items-center justify-center w-full sm:w-auto px-10 py-5 text-xl font-bold text-white bg-brand-red hover:bg-red-800 rounded-sm transition-all shadow-[0_0_20px_rgba(139,26,26,0.3)] hover:shadow-[0_0_40px_rgba(139,26,26,0.6)] animate-bounce-slow" aria-label="Call Bobby Now">
+                                <i data-lucide="phone" class="w-6 h-6 mr-3"></i>
+                                Call Bobby Now
+                            </a>
+                            
+                            <div class="flex items-center gap-4 mt-4">
+                                <span class="text-3xl md:text-5xl font-black text-white tracking-wider glow-text-red">936-634-7119</span>
+                            </div>
+
+                            <a href="mailto:contact@bobbyscutnup.com" class="text-brand-muted hover:text-white transition-colors text-sm uppercase tracking-widest flex items-center mt-4" aria-label="Send an Email">
+                                <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Or Send an Email
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Web3Forms Session Booking -->
+                    <div class="bg-brand-panel p-8 md:p-10 rounded-sm border border-white/10 shadow-2xl reveal-element">
+                        <div class="text-center mb-8">
+                            <h3 class="text-2xl font-serif text-white font-bold">Request a Session</h3>
+                            <p class="text-brand-muted text-sm mt-2">Submit your preferred time below.</p>
+                        </div>
+
+                        <!-- Replace YOUR_ACCESS_KEY_HERE with actual Web3Forms key -->
+                        <form action="https://api.web3forms.com/submit" method="POST" class="space-y-6">
+                            <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                            <input type="hidden" name="subject" value="New Session Request - Bobby's Cut-N-Up">
+                            <input type="hidden" name="from_name" value="Bobby's Website">
+                            
+                            <!-- Honeypot -->
+                            <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-brand-muted mb-2">Full Name</label>
+                                <input type="text" id="name" name="name" required class="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-colors" placeholder="John Doe">
+                            </div>
+
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-brand-muted mb-2">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" required class="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-colors" placeholder="(936) 555-0123">
+                            </div>
+
+                            <div>
+                                <label for="time" class="block text-sm font-medium text-brand-muted mb-2">Preferred Session Time</label>
+                                <select id="time" name="time" class="w-full bg-black border border-white/10 rounded-sm px-4 py-3 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-colors appearance-none">
+                                    <option value="Morning">Morning (8am - 12pm)</option>
+                                    <option value="Afternoon">Afternoon (12pm - 5pm)</option>
+                                    <option value="Anytime">Anytime</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-white text-black hover:bg-brand-muted font-bold py-4 rounded-sm transition-colors flex justify-center items-center" aria-label="Submit session request">
+                                Book a Session
+                                <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                            </button>
+                            
+                            <!-- Added Disclaimer per Request -->
+                            <div class="mt-4 p-4 bg-brand-red/5 border border-brand-red/20 rounded-sm flex items-start gap-3">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-brand-red shrink-0 mt-0.5"></i>
+                                <p class="text-xs text-brand-muted leading-relaxed">
+                                    <strong class="text-white block mb-1">Disclaimer</strong> 
+                                    Your preferred time may be rescheduled based on shop volume. For immediate confirmation and to lock in your spot, <span class="text-white">it's best you call Bobby directly at 936-634-7119.</span>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 9️⃣ Footer -->
+    <footer class="bg-black border-t border-white/10 pt-16 pb-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-12">
+                
+                <!-- Brand Info -->
+                <div class="md:col-span-5">
+                    <a href="#" class="flex items-center gap-2 mb-4 group inline-flex" aria-label="Go to homepage">
+                        <i data-lucide="scissors" class="w-6 h-6 text-brand-red"></i>
+                        <span class="font-serif font-bold text-2xl tracking-tight text-white">Bobby's Cut-N-Up</span>
+                    </a>
+                    <p class="text-brand-muted text-sm max-w-xs leading-relaxed mb-6">
+                        Lufkin's favorite barber. Call ahead or walk right in. Precision cuts, old-school service.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="tel:+19366347119" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-brand-red transition-colors" aria-label="Call Bobby">
+                            <i data-lucide="phone" class="w-4 h-4"></i>
+                        </a>
+                        <a href="mailto:contact@bobbyscutnup.com" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-brand-red transition-colors" aria-label="Email Bobby">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </a>
+                        <a href="https://maps.google.com/?q=3213+S.+Medford+Plaza,+Lufkin,+TX+75904" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-brand-red transition-colors" aria-label="Get Directions">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="md:col-span-3">
+                    <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-4">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#why-bobby" class="text-brand-muted hover:text-white transition-colors text-sm">Why Bobby?</a></li>
+                        <li><a href="#about" class="text-brand-muted hover:text-white transition-colors text-sm">About The Shop</a></li>
+                        <li><a href="#reviews" class="text-brand-muted hover:text-white transition-colors text-sm">Customer Reviews</a></li>
+                        <li><a href="#booking" class="text-brand-muted hover:text-brand-red transition-colors text-sm font-medium">Book a Session</a></li>
+                    </ul>
+                </div>
+
+                <!-- Location & Contact -->
+                <div class="md:col-span-4">
+                    <h4 class="text-white font-bold uppercase tracking-wider text-sm mb-4">Location & Hours</h4>
+                    <address class="not-italic text-brand-muted text-sm space-y-3">
+                        <p class="flex items-start gap-3">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-brand-red shrink-0 mt-0.5"></i>
+                            <a href="https://maps.google.com/?q=3213+S.+Medford+Plaza,+Lufkin,+TX+75904" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">
+                                3213 S. Medford Plaza<br>Lufkin, TX 75904
+                            </a>
+                        </p>
+                        <p class="flex items-center gap-3">
+                            <i data-lucide="phone" class="w-5 h-5 text-brand-red shrink-0"></i>
+                            <a href="tel:+19366347119" class="hover:text-white transition-colors">936-634-7119</a>
+                        </p>
+                        <p class="flex items-start gap-3 pt-2">
+                            <i data-lucide="clock" class="w-5 h-5 text-brand-red shrink-0 mt-0.5"></i>
+                            <span>
+                                Open Monday - Friday<br>
+                                Walk-Ins & Calls Welcome
+                            </span>
+                        </p>
+                    </address>
+                </div>
+
+            </div>
+
+            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-brand-muted text-xs text-center md:text-left">
+                    &copy; <span id="year"></span> Bobby's Cut-N-Up. All rights reserved. Barber Shop Lufkin TX.
+                </p>
+                <div class="text-brand-muted text-xs">
+                    Designed for Conversions.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        // 1. Initialize Icons
+        lucide.createIcons();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 2. Canvas Particle Engine (Smoke Effect)
+        class ParticleEngine {
+            constructor(canvasId, densityMultiplier = 1) {
+                this.canvas = document.getElementById(canvasId);
+                if(!this.canvas) return;
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.densityMultiplier = densityMultiplier;
+                this.isActive = true;
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                this.initParticles();
+                this.animate();
+            }
+
+            resize() {
+                this.width = this.canvas.width = window.innerWidth;
+                this.height = this.canvas.height = window.innerHeight;
+            }
+
+            initParticles() {
+                const count = Math.floor((this.width * this.height) / 20000) * this.densityMultiplier;
+                for (let i = 0; i < count; i++) {
+                    this.particles.push(this.createParticle(true));
+                }
+            }
+
+            createParticle(randomY = false) {
+                // Mix of grey and white smoke
+                const isWhite = Math.random() > 0.5;
+                const r = isWhite ? 240 : 136;
+                const g = isWhite ? 240 : 136;
+                const b = isWhite ? 240 : 136;
+                
+                return {
+                    x: Math.random() * this.width,
+                    y: randomY ? Math.random() * this.height : this.height + Math.random() * 100,
+                    radius: Math.random() * 60 + 20, // large soft circles
+                    speedY: Math.random() * 0.5 + 0.1, // slow rising
+                    speedX: (Math.random() - 0.5) * 0.3, // slight drift
+                    opacity: Math.random() * 0.15 + 0.05, // very subtle
+                    color: `${r}, ${g}, ${b}`,
+                    life: Math.random() * 100
+                };
+            }
+
+            animate() {
+                if (!this.isActive) return;
+                requestAnimationFrame(() => this.animate());
+                
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                for (let i = 0; i < this.particles.length; i++) {
+                    let p = this.particles[i];
+                    
+                    // Move
+                    p.y -= p.speedY;
+                    p.x += Math.sin(p.life * 0.01) * p.speedX; // Wavy drift
+                    p.life++;
+                    
+                    // Fade out near top
+                    let currentOpacity = p.opacity;
+                    if (p.y < this.height * 0.3) {
+                        currentOpacity = p.opacity * (p.y / (this.height * 0.3));
+                    }
+
+                    // Draw radial gradient for soft smoke look
+                    let gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+                    gradient.addColorStop(0, `rgba(${p.color}, ${currentOpacity})`);
+                    gradient.addColorStop(1, `rgba(${p.color}, 0)`);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.fill();
+
+                    // Respawn
+                    if (p.y + p.radius < 0) {
+                        this.particles[i] = this.createParticle(false);
+                    }
+                }
+            }
+            
+            stop() {
+                this.isActive = false;
+            }
+        }
+
+        // Initialize Canvases
+        const loaderSmoke = new ParticleEngine('loader-canvas', 1.5);
+        const heroSmoke = new ParticleEngine('hero-canvas', 0.8);
+
+        // 3. Cinematic Loader Sequence (GSAP)
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    document.getElementById('loader-overlay').style.display = 'none';
+                    loaderSmoke.stop(); // save resources
+                    initScrollAnimations();
+                }
+            });
+
+            // Sequence < 3 seconds
+            tl.to("#loader-brand", { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out", delay: 0.2 })
+              .to("#loader-brand", { textShadow: "0 0 20px rgba(139, 26, 26, 0.8), 0 0 40px rgba(139, 26, 26, 0.6)", duration: 0.5 }, "-=0.4")
+              .to("#loader-location", { opacity: 1, duration: 0.5 }, "-=0.2")
+              .to("#loader-line-container", { opacity: 1, duration: 0.1 }, "-=0.3")
+              .to("#loader-line", { x: "0%", duration: 0.6, ease: "power2.inOut" })
+              .to("#loader-overlay", { opacity: 0, duration: 0.6, ease: "power2.inOut", delay: 0.4 });
+        });
+
+        // 4. Scroll Animations
+        function initScrollAnimations() {
+            // Hero elements animate in after loader finishes
+            gsap.to(".hero-elem", {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out"
+            });
+
+            // General reveal elements on scroll
+            gsap.utils.toArray('.reveal-element:not(.hero-elem)').forEach(elem => {
+                gsap.to(elem, {
+                    scrollTrigger: {
+                        trigger: elem,
+                        start: "top 85%", // trigger when top of elem hits 85% of viewport
+                        toggleActions: "play none none none"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    ease: "power2.out"
+                });
+            });
+
+            // Feature Cards Stagger
+            gsap.to(".feature-card", {
+                scrollTrigger: {
+                    trigger: "#why-bobby",
+                    start: "top 70%",
+                },
+                y: 0,
+                opacity: 1,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "back.out(1.7)"
+            });
+
+            // Review Cards Stagger
+            gsap.to(".review-card", {
+                scrollTrigger: {
+                    trigger: "#reviews",
+                    start: "top 70%",
+                },
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: "power2.out"
+            });
+        }
+
+        // 5. Mobile Menu & Header Logic
+        const header = document.getElementById('main-header');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-lg');
+                header.style.backgroundColor = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                header.classList.remove('shadow-lg');
+                header.style.backgroundColor = 'rgba(10, 10, 10, 0.95)';
+            }
+        });
+
+        function toggleMenu() {
+            const isOpen = mobileMenu.classList.contains('translate-x-0');
+            if (isOpen) {
+                mobileMenu.classList.remove('translate-x-0');
+                mobileMenu.classList.add('translate-x-full');
+                document.body.style.overflow = '';
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('translate-x-0');
+                document.body.style.overflow = 'hidden'; // prevent scrolling behind menu
+                mobileMenuBtn.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+    </script>
+</body>
+</html>
